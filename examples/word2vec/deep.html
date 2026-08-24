@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word2Vec — Section Deep Dives</title>
+  <link rel="stylesheet" href="../../skills/read-research-paper/templates/paper-pages.css" />
+</head>
+<body>
+
+  <nav class="pack-nav">
+    <span class="brand">Word2Vec pack</span>
+    <a href="slides.html">Slides</a>
+    <a href="deep.html" class="active">Deep dives</a>
+    <a href="worked.html">Worked example</a>
+    <a href="glossary.html">Glossary</a>
+  </nav>
+
+  <main class="page">
+    <header class="page-hero">
+      <h1>Section Deep Dives</h1>
+      <p class="subtitle">Word2Vec — one section at a time, plain language</p>
+      <p class="meta">Efficient Estimation of Word Representations in Vector Space · Mikolov et al. 2013 · 12 pages</p>
+    </header>
+
+    <nav class="toc">
+      <a href="#intro">Introduction</a>
+      <a href="#prev">Previous work</a>
+      <a href="#arch">Complexity</a>
+      <a href="#cbow">CBOW</a>
+      <a href="#skip">Skip-gram</a>
+      <a href="#results">Results</a>
+      <a href="#impact">Conclusion</a>
+    </nav>
+
+    <section class="section-block" id="intro">
+      <div class="section-num">§1 Introduction</div>
+      <h2>The problem with word IDs</h2>
+      <p class="plain">
+        Most NLP systems treat each word as an atomic unit — just an index in a vocabulary.
+        Index 3 and index 7 are simply different integers, so the model has no way to know
+        that two words might mean similar things.
+      </p>
+      <div class="visual">
+        <svg width="340" height="80" viewBox="0 0 340 80" role="img" aria-label="Word indices carry no similarity">
+          <text x="30" y="35" fill="#ff6b8a" font-size="14">cat → 3</text>
+          <text x="30" y="60" fill="#ff6b8a" font-size="14">dog → 7</text>
+          <text x="180" y="48" fill="#8b92a8" font-size="24">≠ similar</text>
+        </svg>
+      </div>
+      <p class="plain">
+        That simplicity has real virtues — it is robust, and simple models on huge data often beat
+        complex models on small data. But it hits a ceiling: N-grams can already be trained on
+        virtually all available text, and there is nowhere further to go.
+      </p>
+      <p class="from-paper"><strong>From the paper:</strong> Current systems treat words as atomic units — there is no notion of similarity between words, as these are represented as indices in a vocabulary (§1, p.1)</p>
+    </section>
+
+    <section class="section-block" id="prev">
+      <div class="section-num">§1.1–1.2 Goals and previous work</div>
+      <h2>Standing on NNLM's shoulders</h2>
+      <p class="plain">
+        Neural network language models already learned word vectors — but jointly with a full
+        statistical language model, using a linear projection layer plus a non-linear hidden layer.
+        A later architecture split the job in two: learn the vectors first, then train the language
+        model. The vectors could be learned without ever building the full NNLM.
+      </p>
+      <div class="visual">
+        <svg width="400" height="100" viewBox="0 0 400 100" role="img" aria-label="Full NNLM simplified to vector learning only">
+          <rect x="10" y="30" width="120" height="40" rx="8" fill="#222633" stroke="#ff6b8a" stroke-width="2"/>
+          <text x="70" y="55" text-anchor="middle" fill="#ff6b8a" font-size="11">Full NNLM</text>
+          <text x="70" y="85" text-anchor="middle" fill="#8b92a8" font-size="10">joint, expensive</text>
+          <text x="180" y="55" text-anchor="middle" fill="#6c8cff" font-size="20">→</text>
+          <rect x="230" y="30" width="160" height="40" rx="8" fill="#222633" stroke="#56d4a0" stroke-width="2"/>
+          <text x="310" y="55" text-anchor="middle" fill="#56d4a0" font-size="11">Word vectors only</text>
+          <text x="310" y="85" text-anchor="middle" fill="#8b92a8" font-size="10">separable step</text>
+        </svg>
+      </div>
+      <p class="plain">
+        The scale problem was the opening. Nobody had trained these architectures past a few hundred
+        million words, at dimensionality between 50 and 100. This paper goes after billions of words
+        and a million-word vocabulary.
+      </p>
+      <p class="from-paper"><strong>From the paper:</strong> None of the previously proposed architectures has been successfully trained on more than a few hundred of millions of words, with a modest dimensionality of the word vectors between 50 and 100 (§1.1, p.2)</p>
+    </section>
+
+    <section class="section-block" id="arch">
+      <div class="section-num">§2 Model architectures</div>
+      <h2>The complexity budget</h2>
+      <p class="plain">
+        Every model in the paper is measured by one formula. Training cost is proportional to
+        epochs × training words × cost per word. The first two are fixed by your data and patience,
+        so the only lever is <em>Q</em> — the work done per word.
+      </p>
+      <div class="visual">
+        <p style="font-family:ui-monospace,monospace;color:#56d4a0;font-size:1.15rem">O = E × T × Q</p>
+        <p style="color:#8b92a8;font-size:0.85rem;margin-top:0.5rem">E = epochs (typically 3–50) · T = training words (up to one billion) · Q = cost per word</p>
+      </div>
+      <p class="plain">
+        In the older NNLM, most of Q is spent between the projection layer and the non-linear hidden
+        layer. Word2Vec's whole strategy is to delete that hidden layer, collapsing Q to little more
+        than a lookup and a softmax.
+      </p>
+      <p class="from-paper"><strong>From the paper:</strong> For all the following models, the training complexity is proportional to O = E × T × Q, where E is number of the training epochs, T is the number of the words in the training set (§2, p.3)</p>
+    </section>
+
+    <section class="section-block" id="cbow">
+      <div class="section-num">§3.1 Continuous Bag-of-Words</div>
+      <h2>Context predicts the middle word</h2>
+      <p class="plain">
+        <strong>Context → centre.</strong> Remove the non-linear hidden layer, and share the projection
+        layer across every word so all context words land in the same place — their vectors get averaged.
+        Word order stops mattering, which is why it is called bag-of-words.
+      </p>
+      <div class="visual">
+        <div class="token-row">
+          <span class="token context">The</span>
+          <span class="token context">cat</span>
+          <span class="token context">sat</span>
+          <span class="token context">on</span>
+          <span style="color:#6c8cff;padding:0 0.5rem">→</span>
+          <span class="token center">mat</span>
+        </div>
+        <p style="color:#8b92a8;font-size:0.8rem;margin-top:0.75rem">4 history + 4 future words in, one middle word out</p>
+      </div>
+      <p class="plain">
+        The best configuration uses four history words and four future words as input, and is trained
+        to classify the current middle word correctly. Using future words is unusual for a language
+        model — but this is not a language model, so nothing forbids it.
+      </p>
+      <p class="from-paper"><strong>From the paper:</strong> Best performance came from a log-linear classifier with four future and four history words at the input, where the training criterion is to correctly classify the current middle word (§3.1, p.4)</p>
+    </section>
+
+    <section class="section-block" id="skip">
+      <div class="section-num">§3.2 Continuous Skip-gram</div>
+      <h2>Middle word predicts context</h2>
+      <p class="plain">
+        <strong>Centre → context.</strong> Run CBOW backwards: take the current word as input and predict
+        the words within a range before and after it. Widening the range improves the vectors but costs
+        more compute, so distant words are sampled less often.
+      </p>
+      <div class="visual">
+        <div class="token-row">
+          <span class="token center">sat</span>
+          <span style="color:#6c8cff;padding:0 0.5rem">→</span>
+          <span class="token predict">The</span>
+          <span class="token predict">cat</span>
+          <span class="token predict">on</span>
+          <span class="token predict">mat</span>
+        </div>
+        <p style="font-family:ui-monospace,monospace;color:#56d4a0;font-size:0.95rem;margin-top:0.9rem">Q = C × (D + D × log2(V))</p>
+      </div>
+      <p class="plain">
+        <em>C</em> is the maximum distance considered. For each training word the model picks a random
+        R between 1 and C, then uses R words of history and R of future as labels — so cost scales with
+        the window, not the vocabulary. The experiments use C = 10.
+      </p>
+      <p class="from-paper"><strong>From the paper:</strong> If we choose C = 5, for each training word we select randomly a number R in range 1 to C, then use R words from history and R words from the future as correct labels; in the experiments we use C = 10 (§3.2, p.5)</p>
+    </section>
+
+    <section class="section-block" id="results">
+      <div class="section-num">§4.2–4.4 Results</div>
+      <h2>Cheaper models, better vectors</h2>
+      <p class="plain">
+        Training used a Google News corpus of about 6B tokens, with the vocabulary capped at the
+        1 million most frequent words. Quality is scored on a test set of semantic and syntactic
+        analogy questions.
+      </p>
+      <div class="visual">
+        <svg width="420" height="200" viewBox="0 0 420 200" role="img" aria-label="Total accuracy on the 6B-token corpus: NNLM 50.8 percent, CBOW 63.7 percent, Skip-gram 65.6 percent">
+          <text x="210" y="14" text-anchor="middle" fill="#8b92a8" font-size="11">Total accuracy on 6B tokens — Table 6</text>
+
+          <line x1="60" y1="160" x2="400" y2="160" stroke="#2c3142" stroke-width="1"/>
+          <line x1="60" y1="34" x2="400" y2="34" stroke="#2c3142" stroke-width="1" stroke-dasharray="3 4"/>
+          <text x="52" y="164" text-anchor="end" fill="#8b92a8" font-size="9">0</text>
+          <text x="52" y="38" text-anchor="end" fill="#8b92a8" font-size="9">70%</text>
+
+          <rect x="90" y="69" width="52" height="91" rx="3" fill="#6c8cff" opacity="0.55"/>
+          <text x="116" y="61" text-anchor="middle" fill="#8b92a8" font-size="13">50.8</text>
+          <text x="116" y="176" text-anchor="middle" fill="#f0f2f8" font-size="11">NNLM</text>
+          <text x="116" y="190" text-anchor="middle" fill="#8b92a8" font-size="9">14 × 180 days·cores</text>
+
+          <rect x="194" y="45" width="52" height="115" rx="3" fill="#56d4a0" opacity="0.75"/>
+          <text x="220" y="37" text-anchor="middle" fill="#56d4a0" font-size="13">63.7</text>
+          <text x="220" y="176" text-anchor="middle" fill="#f0f2f8" font-size="11">CBOW</text>
+          <text x="220" y="190" text-anchor="middle" fill="#8b92a8" font-size="9">2 × 140 days·cores</text>
+
+          <rect x="298" y="42" width="52" height="118" rx="3" fill="#56d4a0"/>
+          <text x="324" y="34" text-anchor="middle" fill="#56d4a0" font-size="13">65.6</text>
+          <text x="324" y="176" text-anchor="middle" fill="#f0f2f8" font-size="11">Skip-gram</text>
+          <text x="324" y="190" text-anchor="middle" fill="#8b92a8" font-size="9">2.5 × 125 days·cores</text>
+        </svg>
+      </div>
+      <p class="plain">
+        Both new models beat NNLM on accuracy while costing far less: NNLM needed 14 days across 180
+        CPU cores, CBOW needed 2 days across 140. The two architectures also split the win — Skip-gram
+        is much stronger on semantics, CBOW on syntax.
+      </p>
+      <p class="from-paper"><strong>From the paper:</strong> On the 6B set, NNLM reached 50.8 total accuracy in 14 x 180 days x CPU cores, CBOW reached 63.7 in 2 x 140, and Skip-gram reached 65.6 in 2.5 x 125 (§4.4, p.8)</p>
+    </section>
+
+    <section class="section-block" id="impact">
+      <div class="section-num">§6–7 Conclusion and follow-up</div>
+      <h2>Why this changed NLP</h2>
+      <p class="plain">
+        The finding is that very simple architectures produce high-quality vectors, which means the
+        compute saved can be spent on more data instead. The authors project training on corpora of
+        one trillion words as a realistic target.
+      </p>
+      <div class="visual">
+        <p style="font-size:1.1rem;color:#56d4a0;font-weight:600">vector(King) − vector(Man) + vector(Woman) ≈ Queen</p>
+        <p style="color:#8b92a8;font-size:0.85rem;margin-top:0.5rem">Shown in earlier work (§1.2, p.2) — this paper's goal is to make it far more accurate</p>
+      </div>
+      <p class="plain">
+        Afterwards the authors released multi-threaded C++ code running at billions of words per hour,
+        plus more than 1.4 million named-entity vectors trained on over 100 billion words. That release,
+        more than the paper itself, is what put embeddings into everyone's pipeline.
+      </p>
+      <p class="from-paper"><strong>From the paper:</strong> We published single-machine multi-threaded C++ code, and more than 1.4 million vectors that represent named entities, trained on more than 100 billion words (§7, p.11)</p>
+    </section>
+  </main>
+
+</body>
+</html>

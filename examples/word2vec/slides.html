@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word2Vec — Explained</title>
+  <link rel="stylesheet" href="../../skills/read-research-paper/templates/paper-deck.css" />
+  <link rel="stylesheet" href="../../skills/read-research-paper/templates/paper-pages.css" />
+</head>
+<body>
+  <nav class="pack-nav" style="position:fixed;z-index:200;width:100%">
+    <span class="brand">Word2Vec pack</span>
+    <a href="slides.html" class="active">Slides</a>
+    <a href="deep.html">Deep dives</a>
+    <a href="worked.html">Worked example</a>
+    <a href="glossary.html">Glossary</a>
+  </nav>
+  <div class="deck" style="padding-top:3rem">
+
+    <section class="slide slide-cover active">
+      <span class="slide-tag">Research paper</span>
+      <h1>Efficient Estimation of Word Representations in Vector Space</h1>
+      <p class="authors">Mikolov, Chen, Corrado, Dean — Google</p>
+      <p class="meta">arXiv 1301.3781 · 2013</p>
+      <span class="slide-num">1 / 9</span>
+    </section>
+
+    <section class="slide slide-hook">
+      <span class="slide-tag">Why this matters</span>
+      <div class="visual">
+        <div class="icon-circle">🔢</div>
+        <div style="font-size:2rem;color:var(--muted)">→</div>
+        <div class="icon-circle good">🗺️</div>
+      </div>
+      <h2>Words as numbers can't capture meaning</h2>
+      <p>Computers need a way to know "king" relates to "queen"</p>
+      <span class="slide-num">2 / 9</span>
+    </section>
+
+    <section class="slide">
+      <span class="slide-tag">The gap</span>
+      <div class="split">
+        <div class="panel before">
+          <span class="label">Before</span>
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <text x="20" y="35" fill="#ff6b8a" font-size="14">cat=3</text>
+            <text x="20" y="55" fill="#ff6b8a" font-size="14">dog=7</text>
+            <text x="8" y="75" fill="#8b92a8" font-size="9">just IDs</text>
+          </svg>
+          <p>Each word is a random ID — no similarity</p>
+        </div>
+        <div class="arrow-mid">→</div>
+        <div class="panel after">
+          <span class="label">After</span>
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="30" cy="40" r="8" fill="#56d4a0"/>
+            <circle cx="55" cy="35" r="8" fill="#56d4a0"/>
+            <line x1="30" y1="40" x2="55" y2="35" stroke="#56d4a0" stroke-width="2"/>
+            <text x="8" y="72" fill="#8b92a8" font-size="9">near = similar</text>
+          </svg>
+          <p>Similar words sit close in vector space</p>
+        </div>
+      </div>
+      <span class="slide-num">3 / 9</span>
+    </section>
+
+    <section class="slide slide-idea">
+      <span class="slide-tag">Core idea</span>
+      <p class="big-idea">Learn word meaning from nearby words in text</p>
+      <p class="sub">Like guessing "bank" means river or money from context</p>
+      <span class="slide-num">4 / 9</span>
+    </section>
+
+    <section class="slide">
+      <span class="slide-tag">How it works</span>
+      <div class="flow">
+        <div class="flow-node">Huge text corpus</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">Sliding window</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">Predict neighbors</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">Word vectors</div>
+      </div>
+      <p class="caption">Train fast on billions of words — no heavy neural nets needed</p>
+      <span class="slide-num">5 / 9</span>
+    </section>
+
+    <section class="slide">
+      <span class="slide-tag">Key mechanism</span>
+      <div class="diagram-box">
+        <svg width="520" height="160" viewBox="0 0 520 160">
+          <!-- Skip-gram -->
+          <text x="130" y="20" text-anchor="middle" fill="#6c8cff" font-size="12" font-weight="600">Skip-gram</text>
+          <rect x="110" y="60" width="40" height="28" rx="6" fill="#1a1d27" stroke="#6c8cff" stroke-width="2"/>
+          <text x="130" y="79" text-anchor="middle" fill="#f0f2f8" font-size="11">king</text>
+          <line x1="150" y1="74" x2="200" y2="45" stroke="#8b92a8" stroke-width="1.5"/>
+          <line x1="150" y1="74" x2="200" y2="74" stroke="#8b92a8" stroke-width="1.5"/>
+          <line x1="150" y1="74" x2="200" y2="103" stroke="#8b92a8" stroke-width="1.5"/>
+          <rect x="200" y="32" width="50" height="22" rx="4" fill="#1a1d27" stroke="#56d4a0" stroke-width="1.5"/>
+          <text x="225" y="47" text-anchor="middle" fill="#56d4a0" font-size="10">queen</text>
+          <rect x="200" y="63" width="50" height="22" rx="4" fill="#1a1d27" stroke="#56d4a0" stroke-width="1.5"/>
+          <text x="225" y="78" text-anchor="middle" fill="#56d4a0" font-size="10">royal</text>
+          <rect x="200" y="94" width="50" height="22" rx="4" fill="#1a1d27" stroke="#56d4a0" stroke-width="1.5"/>
+          <text x="225" y="109" text-anchor="middle" fill="#56d4a0" font-size="10">throne</text>
+          <text x="130" y="130" text-anchor="middle" fill="#8b92a8" font-size="10">center → predict context</text>
+          <!-- CBOW -->
+          <text x="390" y="20" text-anchor="middle" fill="#6c8cff" font-size="12" font-weight="600">CBOW</text>
+          <rect x="320" y="32" width="44" height="22" rx="4" fill="#1a1d27" stroke="#56d4a0" stroke-width="1.5"/>
+          <text x="342" y="47" text-anchor="middle" fill="#56d4a0" font-size="10">the</text>
+          <rect x="370" y="32" width="44" height="22" rx="4" fill="#1a1d27" stroke="#56d4a0" stroke-width="1.5"/>
+          <text x="392" y="47" text-anchor="middle" fill="#56d4a0" font-size="10">cat</text>
+          <rect x="420" y="32" width="44" height="22" rx="4" fill="#1a1d27" stroke="#56d4a0" stroke-width="1.5"/>
+          <text x="442" y="47" text-anchor="middle" fill="#56d4a0" font-size="10">on</text>
+          <line x1="342" y1="54" x2="392" y2="85" stroke="#8b92a8" stroke-width="1.5"/>
+          <line x1="392" y1="54" x2="392" y2="85" stroke="#8b92a8" stroke-width="1.5"/>
+          <line x1="442" y1="54" x2="392" y2="85" stroke="#8b92a8" stroke-width="1.5"/>
+          <rect x="370" y="85" width="44" height="28" rx="6" fill="#1a1d27" stroke="#6c8cff" stroke-width="2"/>
+          <text x="392" y="104" text-anchor="middle" fill="#f0f2f8" font-size="11">mat</text>
+          <text x="390" y="130" text-anchor="middle" fill="#8b92a8" font-size="10">context → predict center</text>
+        </svg>
+      </div>
+      <p class="caption">Two lightweight architectures — both beat older neural language models</p>
+      <span class="slide-num">6 / 9</span>
+    </section>
+
+    <section class="slide">
+      <span class="slide-tag">Results</span>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="value">1.6B</div>
+          <div class="label">words trained on</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">&lt;1 day</div>
+          <div class="label">training time</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">~300</div>
+          <div class="label">vector dimensions</div>
+        </div>
+      </div>
+      <div class="bar-chart">
+        <div class="bar-col"><div class="bar" style="height:45%"></div><span>NNLM</span></div>
+        <div class="bar-col"><div class="bar" style="height:62%"></div><span>CBOW</span></div>
+        <div class="bar-col"><div class="bar highlight" style="height:88%"></div><span>Skip-gram</span></div>
+      </div>
+      <span class="slide-num">7 / 9</span>
+    </section>
+
+    <section class="slide">
+      <span class="slide-tag">So what?</span>
+      <div class="impact-row">
+        <div class="impact-item"><div class="emoji">⚡</div><p>Fast enough for web-scale data</p></div>
+        <div class="impact-item"><div class="emoji">🧠</div><p>Embeddings power modern NLP</p></div>
+        <div class="impact-item"><div class="emoji">➕</div><p>king − man + woman ≈ queen</p></div>
+      </div>
+      <span class="slide-num">8 / 9</span>
+    </section>
+
+    <section class="slide slide-close">
+      <span class="slide-tag">Remember this</span>
+      <p class="takeaway">You are what you're surrounded by — for words too.</p>
+      <span class="slide-num">9 / 9</span>
+    </section>
+
+  </div>
+
+  <p class="nav-hint">← → or click to navigate</p>
+  <script src="../../skills/read-research-paper/templates/paper-deck.js"></script>
+</body>
+</html>

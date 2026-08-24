@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word2Vec — Worked Example</title>
+  <link rel="stylesheet" href="../../skills/read-research-paper/templates/paper-pages.css" />
+</head>
+<body>
+
+  <nav class="pack-nav">
+    <span class="brand">Word2Vec pack</span>
+    <a href="slides.html">Slides</a>
+    <a href="deep.html">Deep dives</a>
+    <a href="worked.html" class="active">Worked example</a>
+    <a href="glossary.html">Glossary</a>
+  </nav>
+
+  <main class="page">
+    <header class="page-hero">
+      <h1>Worked Example</h1>
+      <p class="subtitle">One word through Skip-gram, then the paper's own analogy test</p>
+      <p class="meta">Skip-gram · C = 10 · 300 dimensions · 783M training words</p>
+    </header>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Start with a sentence</h3>
+          <p>The model slides across plain text, taking each word in turn as the input word.</p>
+          <div class="highlight-box">The · cat · sat · on · the · mat</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Pick the input word and a window</h3>
+          <p>
+            Take <strong>sat</strong> as input. The window is not fixed: the model draws a random
+            R between 1 and C, then uses R words of history and R of future as the labels to predict.
+            Small R happens often, so nearby words get seen more.
+          </p>
+          <div class="token-row">
+            <span class="token context">The</span>
+            <span class="token context">cat</span>
+            <span class="token center">sat</span>
+            <span class="token context">on</span>
+            <span class="token context">the</span>
+          </div>
+          <p style="margin-top:0.5rem;color:#8b92a8;font-size:0.9rem">Drawn here with R = 2, giving R × 2 = 4 predictions</p>
+          <p class="from-paper"><strong>From the paper:</strong> For each training word we select randomly a number R in range 1 to C, then use R words from history and R words from the future as correct labels, requiring R x 2 word classifications (§3.2, p.5)</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Every word starts as noise</h3>
+          <p>Each word owns one vector, initially meaningless. The best-scoring Skip-gram run in the paper uses 300 numbers per word.</p>
+          <div class="highlight-box">
+            sat  → [0.02, -0.11, 0.08, …]   (300 dimensions)<br>
+            cat  → [-0.05, 0.19, 0.03, …]
+          </div>
+          <p class="from-paper"><strong>From the paper:</strong> Skip-gram with vector dimensionality 300 trained on 783M words reached 50.0 semantic and 55.9 syntactic accuracy (§4.3, p.8)</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Predict the neighbours</h3>
+          <p>Using <strong>sat</strong>'s vector, the model scores the vocabulary and should rank its real neighbours highly. Wrong guesses get penalised, and both vectors shift a little.</p>
+          <div class="token-row">
+            <span class="token center">sat</span>
+            <span style="color:#6c8cff">→ predict →</span>
+            <span class="token predict">cat</span>
+            <span class="token predict">on</span>
+          </div>
+          <p style="margin-top:0.5rem;color:#8b92a8;font-size:0.9rem">Cost per word is C × (D + D × log2(V)) — driven by the window, not the vocabulary</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Repeat across the corpus</h3>
+          <p>Every word takes its turn as input, across a Google News corpus of about 6B tokens with the vocabulary capped at the 1 million most frequent words. Words sharing contexts drift together.</p>
+          <div class="visual">
+            <svg width="320" height="120" viewBox="0 0 320 120" role="img" aria-label="Similar words cluster in vector space">
+              <circle cx="80" cy="60" r="10" fill="#56d4a0"/>
+              <text x="80" y="85" text-anchor="middle" fill="#8b92a8" font-size="10">cat</text>
+              <circle cx="160" cy="45" r="10" fill="#56d4a0"/>
+              <text x="160" y="30" text-anchor="middle" fill="#8b92a8" font-size="10">dog</text>
+              <circle cx="160" cy="80" r="10" fill="#56d4a0"/>
+              <text x="160" y="105" text-anchor="middle" fill="#8b92a8" font-size="10">kitten</text>
+              <circle cx="250" cy="60" r="10" fill="#6c8cff"/>
+              <text x="250" y="85" text-anchor="middle" fill="#8b92a8" font-size="10">car</text>
+              <line x1="90" y1="58" x2="150" y2="48" stroke="#56d4a0" stroke-width="1.5" opacity="0.6"/>
+              <line x1="90" y1="62" x2="150" y2="78" stroke="#56d4a0" stroke-width="1.5" opacity="0.6"/>
+            </svg>
+            <p style="color:#8b92a8;font-size:0.85rem">cat, dog, kitten cluster · car sits far away</p>
+          </div>
+          <p class="from-paper"><strong>From the paper:</strong> We used a Google News corpus containing about 6B tokens, and restricted the vocabulary size to 1 million most frequent words (§4.2, p.6)</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h3>Score it with an analogy</h3>
+          <p>
+            This is the paper's own test, not a folk example. To find the word that is to
+            <strong>small</strong> what <strong>biggest</strong> is to <strong>big</strong>,
+            do the arithmetic and then search the space for the nearest vector by cosine distance.
+          </p>
+          <div class="highlight-box">
+            X = vector("biggest") − vector("big") + vector("small")<br>
+            nearest(X) → "smallest"
+          </div>
+          <p class="from-paper"><strong>From the paper:</strong> We compute vector X = vector(biggest) − vector(big) + vector(small), then search the vector space for the word closest to X measured by cosine distance (§4, p.5)</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <h3>The payoff</h3>
+          <p>The same trick carries semantic relationships, not just grammatical ones. Subtract two vectors to define a relationship, then add it to a third word.</p>
+          <div class="visual">
+            <svg width="300" height="80" viewBox="0 0 300 80" role="img" aria-label="Paris minus France plus Italy equals Rome">
+              <text x="10" y="35" fill="#6c8cff" font-size="13">Paris</text>
+              <text x="60" y="35" fill="#ff6b8a" font-size="13">− France</text>
+              <text x="145" y="35" fill="#56d4a0" font-size="13">+ Italy</text>
+              <text x="205" y="35" fill="#8b92a8" font-size="15">=</text>
+              <text x="230" y="35" fill="#56d4a0" font-size="15" font-weight="600">Rome</text>
+              <text x="150" y="65" text-anchor="middle" fill="#8b92a8" font-size="10">closest vector wins</text>
+            </svg>
+          </div>
+          <p style="margin-top:0.75rem;color:#8b92a8;font-size:0.9rem">
+            Worth knowing: the famous <em>King − Man + Woman ≈ Queen</em> line comes from earlier work
+            the paper cites on p.2, not from Word2Vec itself. Word2Vec's contribution is making these
+            operations accurate enough to be useful.
+          </p>
+          <p class="from-paper"><strong>From the paper:</strong> The relationship is defined by subtracting two word vectors and adding the result to another word, so that Paris − France + Italy = Rome (§5, p.9)</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

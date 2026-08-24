@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word2Vec — Glossary</title>
+  <link rel="stylesheet" href="../../skills/read-research-paper/templates/paper-pages.css" />
+</head>
+<body>
+
+  <nav class="pack-nav">
+    <span class="brand">Word2Vec pack</span>
+    <a href="slides.html">Slides</a>
+    <a href="deep.html">Deep dives</a>
+    <a href="worked.html">Worked example</a>
+    <a href="glossary.html" class="active">Glossary</a>
+  </nav>
+
+  <main class="page">
+    <header class="page-hero">
+      <h1>Glossary</h1>
+      <p class="subtitle">Click any card to flip — plain definitions, no jargon chains</p>
+      <p class="meta">Word2Vec · Mikolov et al. 2013</p>
+    </header>
+
+    <p class="glossary-hint">Tap a term to see definition + analogy</p>
+
+    <div class="glossary-grid">
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">NLP</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Natural Language Processing — getting computers to work with human language.</p>
+            <p class="analogy">The field this paper lives in; word vectors are one of its building blocks.</p>
+            <span class="where">§1 Introduction, p.1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Word vector</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">A list of numbers that represents a word. Similar words get similar lists.</p>
+            <p class="analogy">Like GPS coordinates for meaning — close coordinates = related words.</p>
+            <span class="where">§1 Introduction</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Distributed representation</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Meaning spread across many numbers, not stored in a single slot.</p>
+            <p class="analogy">A portrait made of thousands of pixels — no one pixel is "the nose."</p>
+            <span class="where">§1 Introduction</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">N-gram model</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Predicts the next word by counting how often word sequences appear in text.</p>
+            <p class="analogy">Autocomplete based purely on statistics — no understanding of meaning.</p>
+            <span class="where">§1 Introduction</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">NNLM</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Neural Network Language Model — learns word vectors while predicting the next word.</p>
+            <p class="analogy">A student who learns vocabulary only as a side effect of finishing sentences.</p>
+            <span class="where">§2.1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">CBOW</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Continuous Bag-of-Words — uses surrounding words to predict the center word.</p>
+            <p class="analogy">Fill-in-the-blank: "The cat ___ on the" → you guess "sat."</p>
+            <span class="where">§3.1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Skip-gram</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Uses one center word to predict each surrounding word separately.</p>
+            <p class="analogy">Given "king," guess what words typically appear nearby.</p>
+            <span class="where">§3.2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Context window</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">How many neighboring words on each side count as "context" (typically 5–10).</p>
+            <p class="analogy">How far you peek left and right when reading one word in a sentence.</p>
+            <span class="where">§3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Corpus</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">A large body of text used for training — e.g. Google News (6 billion tokens).</p>
+            <p class="analogy">The textbook the model reads cover to cover, many times.</p>
+            <span class="where">§4.2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Vocabulary</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">The set of words the model knows — here, the 1 million most frequent words.</p>
+            <p class="analogy">The dictionary the model keeps — rare words may be dropped.</p>
+            <span class="where">§4.2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Dimensionality</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">How many numbers in each word vector — typically 300–1000 in this paper.</p>
+            <p class="analogy">More dimensions = finer detail, but more compute and data needed.</p>
+            <span class="where">§4.2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Softmax</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Turns scores into probabilities over all words in the vocabulary.</p>
+            <p class="analogy">A weighted vote across every word — highest probability wins.</p>
+            <span class="where">§3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Stochastic gradient descent</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Learning by repeatedly adjusting vectors after each small batch of examples.</p>
+            <p class="analogy">Fix mistakes one at a time instead of waiting for the whole book.</p>
+            <span class="where">§2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Semantic</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Meaning-based relationships — e.g. Athens:Greece :: Oslo:Norway.</p>
+            <p class="analogy">Do these words mean related things in the real world?</p>
+            <span class="where">§4.1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Syntactic</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Grammar-based relationships — e.g. walking:walked :: swimming:swam.</p>
+            <p class="analogy">Do these words follow the same grammatical pattern?</p>
+            <span class="where">§4.1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Vector offset</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Add/subtract word vectors to find relationships: king − man + woman ≈ queen.</p>
+            <p class="analogy">Directions in vector space encode concepts like "gender" or "capital-of."</p>
+            <span class="where">§1.1, §4</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Log-linear model</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">A model that scores word pairs using dot products — no hidden neural layer.</p>
+            <p class="analogy">Matchmaking by compatibility score instead of a deep interview.</p>
+            <span class="where">§3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">Subsampling</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Randomly skip very frequent words ("the", "a") during training to speed up learning.</p>
+            <p class="analogy">Don't re-read "the" a billion times — focus on informative words.</p>
+            <span class="where">§3.2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <span class="term">DistBelief</span>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="card-back">
+            <p class="def">Google's distributed training framework — many machines train the model in parallel.</p>
+            <p class="analogy">Many cooks working on the same soup simultaneously.</p>
+            <span class="where">§2.3, §4.4</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="../../skills/read-research-paper/templates/glossary.js"></script>
+</body>
+</html>
