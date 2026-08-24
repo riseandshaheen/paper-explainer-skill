@@ -24,7 +24,6 @@ Each paper gets four HTML pages, cross-linked via a top nav bar:
 | Paper | Slides |
 |-------|--------|
 | [Word2Vec](examples/word2vec/1301.3781v3.pdf) (Mikolov et al., 2013) | [examples/word2vec/slides.html](examples/word2vec/slides.html) |
-| [Permissionless Refereed Tournaments](examples/refereed-tournaments/2212.12439v1.pdf) (Nehab & Teixeira, 2022) | [examples/refereed-tournaments/slides.html](examples/refereed-tournaments/slides.html) |
 
 Open any slide file in your browser, then use the nav bar to jump between deliverables.
 
@@ -36,14 +35,12 @@ paper-explainer-skill/
 ├── AGENTS.md                      # Instructions for coding agents
 │
 ├── examples/                      # Paper packs (PDF + explainers)
-│   ├── word2vec/
-│   │   ├── 1301.3781v3.pdf        # Source paper
-│   │   ├── slides.html
-│   │   ├── deep.html
-│   │   ├── worked.html
-│   │   └── glossary.html
-│   └── refereed-tournaments/
-│       └── …
+│   └── word2vec/
+│       ├── 1301.3781v3.pdf        # Source paper
+│       ├── slides.html
+│       ├── deep.html
+│       ├── worked.html
+│       └── glossary.html
 │
 └── skills/read-research-paper/
     ├── SKILL.md                   # Full agent workflow (Steps 1–7)
